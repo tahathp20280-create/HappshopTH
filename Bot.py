@@ -121,6 +121,28 @@ def handle_message(message):
 
     is_admin = user_id == ADMIN_ID
 
+DB.execute("""
+INSERT INTO users (user_id, first_name, username)
+VALUES (?, ?, ?)
+ON CONFLICT(user_id) DO UPDATE SET
+first_name=excluded.first_name,
+username=excluded.username
+""", (
+    user_id,
+    user.get("first_name", ""),
+    user.get("username", "")
+))
+DB.commit()
+
+blocked = DB.execute(
+    "SELECT blocked FROM users WHERE user_id=?",
+    (user_id,)
+).fetchone()
+
+if blocked and blocked["blocked"]:
+    send(chat_id, "⛔ دسترسی شما به ربات مسدود شده است.")
+    return
+
     if msg == "/start":
         send(
             chat_id,
