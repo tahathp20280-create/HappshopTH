@@ -203,7 +203,22 @@ if blocked and blocked["blocked"]:
             )
         else:
             send(chat_id, "⛔ دسترسی غیرمجاز است.")
+    elif msg == "👥 مدیریت مشتریان" and is_admin:
+        users = DB.execute(
+            "SELECT * FROM users ORDER BY created_at DESC"
+        ).fetchall()
 
+        if not users:
+            send(chat_id, "هنوز مشتری ثبت نشده است.")
+        else:
+            text = "👥 فهرست مشتریان:\n\n"
+            for u in users:
+                text += (
+                    f"شناسه: {u['user_id']}\n"
+                    f"نام: {u['first_name']}\n"
+                    f"آیدی: @{u['username'] or 'ندارد'}\n\n"
+                )
+            send(chat_id, text)
     else:
         send(chat_id, "لطفاً از دکمه‌های منو استفاده کنید.")
 
