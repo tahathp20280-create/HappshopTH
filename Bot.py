@@ -219,7 +219,41 @@ if blocked and blocked["blocked"]:
                     f"آیدی: @{u['username'] or 'ندارد'}\n\n"
                 )
             send(chat_id, text)
-        elif msg == "📋 همه سفارش‌ها" and is_admin:
+           elif msg.startswith("/user ") and is_admin:
+        try:
+            customer_id = int(msg.split()[1])
+            customer = DB.execute(
+                "SELECT * FROM users WHERE user_id=?",
+                (customer_id,)
+            ).fetchone()
+
+            if not customer:
+                send(chat_id, "مشتری پیدا نشد.")
+                return
+
+            orders = DB.execute(
+                "SELECT * FROM orders WHERE user_id=? ORDER BY id DESC",
+                (customer_id,)
+            ).fetchall()
+
+            text = (
+                f"👤 نام: {customer['first_name']}\n"
+                f"شناسه: {customer['user_id']}\n"
+                f"آیدی: @{customer['username'] or 'ندارد'}\n\n"
+                "📦 سفارش‌ها:\n"
+            )
+
+            for o in orders:
+                text += (
+                    f"\nسفارش {o['id']}: {o['product']}\n"
+                    f"وضعیت: {o['status']}\n"
+                )
+
+            send(chat_id, text)
+
+        except (ValueError, IndexError):
+            send(chat_id, "فرمت صحیح: /user شناسه_مشتری")
+    elif msg == "📋 همه سفارش‌ها" and is_admin:
         orders = DB.execute(
             "SELECT * FROM orders ORDER BY id DESC"
         ).fetchall()
