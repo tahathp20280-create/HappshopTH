@@ -174,7 +174,8 @@ def handle_message(message):
 
         if not orders:
             send(chat_id, "شما هنوز سفارشی ثبت نکرده‌اید.")
-            returntext = "📦 سفارش‌های شما:\n\n"        for order in orders:
+            return
+            text = "📦 سفارش‌های شما:\n\n"        for order in orders:
             text += (
                 f"شماره سفارش: {order['id']}\n"
                 f"محصول: {order['product']}\n"
