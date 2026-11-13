@@ -80,6 +80,7 @@ def main_keyboard(is_admin=False):
 buttons.append(["👑 پنل مدیریت"])
 buttons.append(["👥 مدیریت مشتریان"])
 buttons.append(["📋 همه سفارش‌ها"])
+buttons.append(["📊 آمار فروش"])
 buttons.append(["⏳ سفارش‌های در انتظار"])
     return {
         "keyboard": buttons,
