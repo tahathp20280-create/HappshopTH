@@ -1,4 +1,6 @@
 import os
+import time
+import requests
 
 TOKEN = os.getenv("BOT_TOKEN")
 URL = f"https://api.telegram.org/bot{TOKEN}/"
