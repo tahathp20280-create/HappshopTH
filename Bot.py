@@ -237,7 +237,23 @@ if blocked and blocked["blocked"]:
                     f"وضعیت: {o['status']}\n\n"
                 )
             send(chat_id, text)
-    else:
+      elif msg == "⏳ سفارش‌های در انتظار" and is_admin:
+        orders = DB.execute(
+            "SELECT * FROM orders WHERE status='reviewing' ORDER BY id DESC"
+        ).fetchall()
+
+        if not orders:
+            send(chat_id, "سفارش در انتظاری وجود ندارد.")
+        else:
+            for o in orders:
+                send(
+                    chat_id,
+                    f"🧾 سفارش شماره {o['id']}\n"
+                    f"مشتری: {o['user_id']}\n"
+                    f"محصول: {o['product']}\n"
+                    f"مبلغ: {o['price']:,} تومان"
+                )
+else:
         send(chat_id, "لطفاً از دکمه‌های منو استفاده کنید.")
 
 def handle_callback(callback):
