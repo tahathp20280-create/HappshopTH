@@ -15,7 +15,6 @@ URL = "https://api.telegram.org/bot" + TOKEN + "/"
 DB = sqlite3.connect("happshop.db")
 DB.row_factory = sqlite3.Row
 
-
 PRODUCTS = [
     ("۵ گیگابایت - یک ماهه", 30000),
     ("۱۰ گیگابایت - یک ماهه", 70000),
@@ -35,17 +34,6 @@ CREATE TABLE IF NOT EXISTS orders (
     status TEXT,
     receipt_id TEXT,
     config TEXT
-)
-""")
-DB.commit()
-
-DB.execute("""
-CREATE TABLE IF NOT EXISTS users (
-    user_id INTEGER PRIMARY KEY,
-    first_name TEXT,
-    username TEXT,
-    blocked INTEGER DEFAULT 0,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP
 )
 """)
 DB.commit()
@@ -76,14 +64,7 @@ def main_keyboard(is_admin=False):
     ]
 
     if is_admin:
-
-
-    if is_admin:
         buttons.append(["👑 پنل مدیریت"])
-        buttons.append(["👥 مدیریت مشتریان"])
-        buttons.append(["📋 همه سفارش‌ها"])
-        buttons.append(["⏳ سفارش‌های در انتظار"])
-        buttons.append(["📊 آمار فروش"])
 
     return {
         "keyboard": buttons,
@@ -127,28 +108,6 @@ def handle_message(message):
         return
 
     is_admin = user_id == ADMIN_ID
-
-DB.execute("""
-INSERT INTO users (user_id, first_name, username)
-VALUES (?, ?, ?)
-ON CONFLICT(user_id) DO UPDATE SET
-first_name=excluded.first_name,
-username=excluded.username
-""", (
-    user_id,
-    user.get("first_name", ""),
-    user.get("username", "")
-))
-DB.commit()
-
-blocked = DB.execute(
-    "SELECT blocked FROM users WHERE user_id=?",
-    (user_id,)
-).fetchone()
-
-if blocked and blocked["blocked"]:
-    send(chat_id, "⛔ دسترسی شما به ربات مسدود شده است.")
-    return
 
     if msg == "/start":
         send(
@@ -207,139 +166,8 @@ if blocked and blocked["blocked"]:
             )
         else:
             send(chat_id, "⛔ دسترسی غیرمجاز است.")
-    elif msg == "👥 مدیریت مشتریان" and is_admin:
-        users = DB.execute(
-            "SELECT * FROM users ORDER BY created_at DESC"
-        ).fetchall()
 
-        if not users:
-            send(chat_id, "هنوز مشتری ثبت نشده است.")
-        else:
-            text = "👥 فهرست مشتریان:\n\n"
-            for u in users:
-                text += (
-                    f"شناسه: {u['user_id']}\n"
-                    f"نام: {u['first_name']}\n"
-                    f"آیدی: @{u['username'] or 'ندارد'}\n\n"
-                )
-            send(chat_id, text)
-              elif msg.startswith("/block ") and is_admin:
-        try:
-            customer_id = int(msg.split()[1])
-            DB.execute(
-                "UPDATE users SET blocked=1 WHERE user_id=?",
-                (customer_id,)
-            )
-            DB.commit()
-            send(chat_id, "🚫 مشتری مسدود شد.")
-        except (ValueError, IndexError):
-            send(chat_id, "فرمت: /block شناسه مشتری")
-
-    elif msg.startswith("/unblock ") and is_admin:
-        try:
-            customer_id = int(msg.split()[1])
-            DB.execute(
-                "UPDATE users SET blocked=0 WHERE user_id=?",
-                (customer_id,)
-            )
-            DB.commit()
-            send(chat_id, "✅ مشتری آزاد شد.")
-        except (ValueError, IndexError):
-            send(chat_id, "فرمت: /unblock شناسه مشتری")
-    elif msg.startswith("/user ") and is_admin:
-        try:
-            customer_id = int(msg.split()[1])
-            customer = DB.execute(
-                "SELECT * FROM users WHERE user_id=?",
-                (customer_id,)
-            ).fetchone()
-
-            if not customer:
-                send(chat_id, "مشتری پیدا نشد.")
-                return
-
-            orders = DB.execute(
-                "SELECT * FROM orders WHERE user_id=? ORDER BY id DESC",
-                (customer_id,)
-            ).fetchall()
-
-            text = (
-                f"👤 نام: {customer['first_name']}\n"
-                f"شناسه: {customer['user_id']}\n"
-                f"آیدی: @{customer['username'] or 'ندارد'}\n\n"
-                "📦 سفارش‌ها:\n"
-            )
-
-            for o in orders:
-                text += (
-                    f"\nسفارش {o['id']}: {o['product']}\n"
-                    f"وضعیت: {o['status']}\n"
-                )
-
-            send(chat_id, text)
-
-        except (ValueError, IndexError):
-            send(chat_id, "فرمت صحیح: /user شناسه_مشتری")
-       elif msg == "📊 آمار فروش" and is_admin:
-        users_count = DB.execute(
-            "SELECT COUNT(*) FROM users"
-        ).fetchone()[0]
-
-        orders_count = DB.execute(
-            "SELECT COUNT(*) FROM orders"
-        ).fetchone()[0]
-
-        delivered = DB.execute(
-            "SELECT COUNT(*) FROM orders WHERE status='delivered'"
-        ).fetchone()[0]
-
-        sales = DB.execute(
-            "SELECT SUM(price) FROM orders WHERE status='delivered'"
-        ).fetchone()[0] or 0
-
-        send(
-            chat_id,
-            "📊 آمار فروشگاه\n\n"
-            f"👥 تعداد مشتریان: {users_count}\n"
-            f"📦 تعداد سفارش‌ها: {orders_count}\n"
-            f"✅ سفارش‌های تحویل‌شده: {delivered}\n"
-            f"💰 فروش تحویل‌شده: {sales:,} تومان"
-        )
-    elif msg == "📋 همه سفارش‌ها" and is_admin:
-        orders = DB.execute(
-            "SELECT * FROM orders ORDER BY id DESC"
-        ).fetchall()
-
-        if not orders:
-            send(chat_id, "هنوز سفارشی ثبت نشده است.")
-        else:
-            text = "📋 همه سفارش‌ها:\n\n"
-            for o in orders:
-                text += (
-                    f"شماره: {o['id']}\n"
-                    f"مشتری: {o['user_id']}\n"
-                    f"محصول: {o['product']}\n"
-                    f"مبلغ: {o['price']:,} تومان\n"
-                    f"وضعیت: {o['status']}\n\n"
-                )
-            send(chat_id, text)
-      elif msg == "⏳ سفارش‌های در انتظار" and is_admin:
-        orders = DB.execute(
-            "SELECT * FROM orders WHERE status='reviewing' ORDER BY id DESC"
-        ).fetchall()
-
-        if not orders:
-            send(chat_id, "سفارش در انتظاری وجود ندارد.")
-        else:
-            for o in orders:
-                send(
-                    chat_id,
-                    f"🧾 سفارش شماره {o['id']}\n"
-                    f"مشتری: {o['user_id']}\n"
-                    f"محصول: {o['product']}\n"
-                    f"مبلغ: {o['price']:,} تومان"
-                )
-else:
+    else:
         send(chat_id, "لطفاً از دکمه‌های منو استفاده کنید.")
 
 def handle_callback(callback):
