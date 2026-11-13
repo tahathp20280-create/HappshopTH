@@ -276,6 +276,31 @@ if blocked and blocked["blocked"]:
 
         except (ValueError, IndexError):
             send(chat_id, "فرمت صحیح: /user شناسه_مشتری")
+       elif msg == "📊 آمار فروش" and is_admin:
+        users_count = DB.execute(
+            "SELECT COUNT(*) FROM users"
+        ).fetchone()[0]
+
+        orders_count = DB.execute(
+            "SELECT COUNT(*) FROM orders"
+        ).fetchone()[0]
+
+        delivered = DB.execute(
+            "SELECT COUNT(*) FROM orders WHERE status='delivered'"
+        ).fetchone()[0]
+
+        sales = DB.execute(
+            "SELECT SUM(price) FROM orders WHERE status='delivered'"
+        ).fetchone()[0] or 0
+
+        send(
+            chat_id,
+            "📊 آمار فروشگاه\n\n"
+            f"👥 تعداد مشتریان: {users_count}\n"
+            f"📦 تعداد سفارش‌ها: {orders_count}\n"
+            f"✅ سفارش‌های تحویل‌شده: {delivered}\n"
+            f"💰 فروش تحویل‌شده: {sales:,} تومان"
+        )
     elif msg == "📋 همه سفارش‌ها" and is_admin:
         orders = DB.execute(
             "SELECT * FROM orders ORDER BY id DESC"
