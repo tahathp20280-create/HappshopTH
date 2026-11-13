@@ -219,6 +219,24 @@ if blocked and blocked["blocked"]:
                     f"آیدی: @{u['username'] or 'ندارد'}\n\n"
                 )
             send(chat_id, text)
+        elif msg == "📋 همه سفارش‌ها" and is_admin:
+        orders = DB.execute(
+            "SELECT * FROM orders ORDER BY id DESC"
+        ).fetchall()
+
+        if not orders:
+            send(chat_id, "هنوز سفارشی ثبت نشده است.")
+        else:
+            text = "📋 همه سفارش‌ها:\n\n"
+            for o in orders:
+                text += (
+                    f"شماره: {o['id']}\n"
+                    f"مشتری: {o['user_id']}\n"
+                    f"محصول: {o['product']}\n"
+                    f"مبلغ: {o['price']:,} تومان\n"
+                    f"وضعیت: {o['status']}\n\n"
+                )
+            send(chat_id, text)
     else:
         send(chat_id, "لطفاً از دکمه‌های منو استفاده کنید.")
 
