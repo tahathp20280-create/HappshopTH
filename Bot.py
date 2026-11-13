@@ -39,6 +39,17 @@ CREATE TABLE IF NOT EXISTS orders (
 """)
 DB.commit()
 
+DB.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    user_id INTEGER PRIMARY KEY,
+    first_name TEXT,
+    username TEXT,
+    blocked INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+)
+""")
+DB.commit()
+
 
 def send(chat_id, text, keyboard=None):
     data = {
