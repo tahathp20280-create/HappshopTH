@@ -219,7 +219,30 @@ if blocked and blocked["blocked"]:
                     f"آیدی: @{u['username'] or 'ندارد'}\n\n"
                 )
             send(chat_id, text)
-           elif msg.startswith("/user ") and is_admin:
+              elif msg.startswith("/block ") and is_admin:
+        try:
+            customer_id = int(msg.split()[1])
+            DB.execute(
+                "UPDATE users SET blocked=1 WHERE user_id=?",
+                (customer_id,)
+            )
+            DB.commit()
+            send(chat_id, "🚫 مشتری مسدود شد.")
+        except (ValueError, IndexError):
+            send(chat_id, "فرمت: /block شناسه مشتری")
+
+    elif msg.startswith("/unblock ") and is_admin:
+        try:
+            customer_id = int(msg.split()[1])
+            DB.execute(
+                "UPDATE users SET blocked=0 WHERE user_id=?",
+                (customer_id,)
+            )
+            DB.commit()
+            send(chat_id, "✅ مشتری آزاد شد.")
+        except (ValueError, IndexError):
+            send(chat_id, "فرمت: /unblock شناسه مشتری")
+    elif msg.startswith("/user ") and is_admin:
         try:
             customer_id = int(msg.split()[1])
             customer = DB.execute(
