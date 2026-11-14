@@ -5,10 +5,8 @@ import requests
 
 TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = 8911720331
-
 if not TOKEN:
-    raise ValueError("BOT_TOKEN is missing")
-
+    raise ValueError("BOT_TOKEN is missing")
 URL = "https://api.telegram.org/bot" + TOKEN + "/"
 
 DB = sqlite3.connect("happshop.db")
