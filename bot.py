@@ -856,4 +856,3 @@ while True:
     except Exception as error:
         print("Bot error:", error)
         time.sleep(5)
-run: python bot.py
