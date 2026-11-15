@@ -478,3 +478,38 @@ def handle_callback(callback):
             "message_id": message["message_id"],
             "reply_markup": {"inline_keyboard": []}
         })
+def run_bot():
+    print("HappshopTH is running!")
+    offset = None
+
+    while True:
+        try:
+            result = api("getUpdates", {
+                "offset": offset,
+                "timeout": 30
+            })
+
+            if not result.get("ok"):
+                time.sleep(3)
+                continue
+
+            for update in result.get("result", []):
+                offset = update["update_id"] + 1
+
+                if "message" in update:
+                    msg = update["message"]
+
+                    if "photo" in msg:
+                        handle_photo(msg)
+                    else:
+                        handle_message(msg)
+
+                elif "callback_query" in update:
+                    handle_callback(update["callback_query"])
+
+        except Exception as error:
+            print("Error:", error)
+            time.sleep(5)
+
+
+run_bot()
