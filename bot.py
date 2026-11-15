@@ -359,6 +359,24 @@ def handle_callback(callback):
         product_key = data.replace("buy_", "", 1)
         buy_product(chat_id, user_id, product_key)
 
+    elif data.startswith("topup_"):
+        amount = int(data.replace("topup_", "", 1))
+
+        if amount in (100000, 200000, 300000):
+            create_topup(chat_id, user_id, amount)
+    data = callback.get("data", "")
+    message = callback.get("message", {})
+    chat_id = message.get("chat", {}).get("id")
+    user_id = callback["from"]["id"]
+
+    api("answerCallbackQuery", {
+        "callback_query_id": callback["id"]
+    })
+
+    if data.startswith("buy_"):
+        product_key = data.replace("buy_", "", 1)
+        buy_product(chat_id, user_id, product_key)
+
 
 def run_bot():
     print("HappshopTH is running!")
