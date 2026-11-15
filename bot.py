@@ -186,7 +186,10 @@ def buy_product(chat_id, user_id, product_key):
         f"مبلغ: {price:,} تومان\n\n"
         f"برای تحویل کانفیگ دستور زیر را ارسال کن:\n"
         f"/deliver {order_id} کانفیگ"
-)def handle_message(message):
+)
+
+
+def handle_message(message):
     chat_id = message["chat"]["id"]
     user_id = message["from"]["id"]
     text = message.get("text", "")
