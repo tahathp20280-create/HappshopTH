@@ -264,9 +264,7 @@ def handle_message(message):
         show_account(chat_id, user_id)
 
     elif text == "💰 شارژ کیف پول":
-        send_message(
-            chat_id,
-            "برای شارژ کیف پول با پشتیبانی تماس بگیر:\n"
+    show_topup_options(chat_id)
             f"{SUPPORT}",
             main_keyboard()
         )
