@@ -201,6 +201,48 @@ def buy_product(chat_id, user_id, product_key):
 )
 
 
+def show_topup_options(chat_id):
+    keyboard = {
+        "inline_keyboard": [
+            [{"text": "۱۰۰ هزار تومان", "callback_data": "topup_100000"}],
+            [{"text": "۲۰۰ هزار تومان", "callback_data": "topup_200000"}],
+            [{"text": "۳۰۰ هزار تومان", "callback_data": "topup_300000"}]
+        ]
+    }
+
+    send_message(
+        chat_id,
+        "💰 مبلغ شارژ کیف پول را انتخاب کن:",
+        keyboard
+    )
+
+
+def create_topup(chat_id, user_id, amount):
+    fee = amount * 3 // 100
+    total = amount + fee
+
+    cursor = db.execute(
+        "INSERT INTO topups "
+        "(user_id, amount, fee, total, status) "
+        "VALUES (?, ?, ?, ?, ?)",
+        (user_id, amount, fee, total, "در انتظار رسید")
+    )
+
+    topup_id = cursor.lastrowid
+    db.commit()
+
+    send_message(
+        chat_id,
+        "💳 اطلاعات پرداخت کارت‌به‌کارت\n\n"
+        "نام صاحب کارت: محمد طاها حسین پور\n"
+        "شماره کارت:\n"
+        "6037991768691648\n\n"
+        f"مبلغ شارژ: {amount:,} تومان\n"
+        f"کارمزد ۳٪: {fee:,} تومان\n"
+        f"مبلغ قابل پرداخت: {total:,} تومان\n\n"
+        "پس از پرداخت، عکس رسید را همین‌جا ارسال کن.\n"
+        f"شماره درخواست: {topup_id}"
+    )
 def handle_message(message):
     chat_id = message["chat"]["id"]
     user_id = message["from"]["id"]
