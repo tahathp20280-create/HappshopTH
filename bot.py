@@ -126,7 +126,10 @@ def show_account(chat_id, user_id):
         "🤝 تعداد زیرمجموعه‌ها: ۰\n"
         "🔖 گروه کاربری: نماینده",
         main_keyboard()
-    )def buy_product(chat_id, user_id, product_key):
+    )
+
+
+def buy_product(chat_id, user_id, product_key):
     if product_key not in PRODUCTS:
         return
 
