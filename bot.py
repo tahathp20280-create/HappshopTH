@@ -414,5 +414,67 @@ def handle_photo(message):
         "بعد از بررسی، نتیجه به تو اطلاع داده می‌شود."
             )
 def handle_callback(callback):
-    
-    run_bot()
+    data = callback.get("data", "")
+    message = callback.get("message", {})
+    chat_id = message.get("chat", {}).get("id")
+    user_id = callback["from"]["id"]
+
+    api("answerCallbackQuery", {
+        "callback_query_id": callback["id"]
+    })
+
+    if data.startswith("buy_"):
+        product_key = data.replace("buy_", "", 1)
+        buy_product(chat_id, user_id, product_key)
+
+    elif data.startswith("topup_"):
+        amount = int(data.replace("topup_", "", 1))
+        if amount in (100000, 200000, 300000):
+            create_topup(chat_id, user_id, amount)
+
+    elif data.startswith("approve_topup_") or data.startswith("reject_topup_"):
+        if user_id != ADMIN_ID:
+            send_message(user_id, "⛔ اجازه انجام این کار را نداری.")
+            return
+
+        approve = data.startswith("approve_topup_")
+        topup_id = int(data.split("_")[-1])
+
+        cursor = db.execute(
+            "SELECT user_id, amount, status FROM topups WHERE id = ?",
+            (topup_id,)
+        )
+        topup = cursor.fetchone()
+
+        if not topup or topup[2] != "در انتظار بررسی":
+            send_message(user_id, "این درخواست قبلاً بررسی شده یا وجود ندارد.")
+            return
+
+        customer_id, amount, status = topup
+
+        if approve:
+            db.execute(
+                "UPDATE topups SET status = ? WHERE id = ?",
+                ("تأیید شده", topup_id)
+            )
+            db.execute(
+                "UPDATE users SET balance = balance + ? WHERE user_id = ?",
+                (amount, customer_id)
+            )
+            db.commit()
+            send_message(customer_id, f"✅ مبلغ {amount:,} تومان به کیف پولت اضافه شد.")
+            send_message(user_id, "✅ پرداخت تأیید شد.")
+        else:
+            db.execute(
+                "UPDATE topups SET status = ? WHERE id = ?",
+                ("رد شده", topup_id)
+            )
+            db.commit()
+            send_message(customer_id, "❌ رسید پرداخت تأیید نشد.")
+            send_message(user_id, "درخواست رد شد.")
+
+        api("editMessageReplyMarkup", {
+            "chat_id": chat_id,
+            "message_id": message["message_id"],
+            "reply_markup": {"inline_keyboard": []}
+        })
