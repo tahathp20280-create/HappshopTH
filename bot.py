@@ -345,6 +345,74 @@ def handle_message(message):
             )
 
 
+def handle_photo(message):
+    chat_id = message["chat"]["id"]
+    user_id = message["from"]["id"]
+
+    photos = message.get("photo", [])
+
+    if not photos:
+        return
+
+    file_id = photos[-1]["file_id"]
+
+    cursor = db.execute(
+        "SELECT id, amount, fee, total FROM topups "
+        "WHERE user_id = ? AND status = ? "
+        "ORDER BY id DESC LIMIT 1",
+        (user_id, "در انتظار رسید")
+    )
+
+    topup = cursor.fetchone()
+
+    if not topup:
+        send_message(
+            chat_id,
+            "❌ ابتدا از بخش شارژ کیف پول، مبلغ را انتخاب کن."
+        )
+        return
+
+    topup_id, amount, fee, total = topup
+
+    db.execute(
+        "UPDATE topups SET receipt_id = ?, status = ? WHERE id = ?",
+        (file_id, "در انتظار بررسی", topup_id)
+    )
+    db.commit()
+
+    keyboard = {
+        "inline_keyboard": [
+            [
+                {
+                    "text": "✅ تأیید پرداخت",
+                    "callback_data": f"approve_topup_{topup_id}"
+                },
+                {
+                    "text": "❌ رد پرداخت",
+                    "callback_data": f"reject_topup_{topup_id}"
+                }
+            ]
+        ]
+    }
+
+    api("sendPhoto", {
+        "chat_id": ADMIN_ID,
+        "photo": file_id,
+        "caption": (
+            f"رسید شارژ شماره {topup_id}\n"
+            f"شناسه کاربر: {user_id}\n"
+            f"مبلغ شارژ: {amount:,} تومان\n"
+            f"کارمزد: {fee:,} تومان\n"
+            f"مبلغ پرداختی: {total:,} تومان"
+        ),
+        "reply_markup": keyboard
+    })
+
+    send_message(
+        chat_id,
+        "✅ رسیدت برای مدیر ارسال شد.\n"
+        "بعد از بررسی، نتیجه به تو اطلاع داده می‌شود."
+            )
 def handle_callback(callback):
     data = callback.get("data", "")
     message = callback.get("message", {})
