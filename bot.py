@@ -43,6 +43,18 @@ CREATE TABLE IF NOT EXISTS orders (
 )
 """)
 
+db.execute("""
+CREATE TABLE IF NOT EXISTS topups (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    amount INTEGER,
+    fee INTEGER,
+    total INTEGER,
+    receipt_id TEXT,
+    status TEXT
+)
+""")
+
 db.commit()
 def api(method, data=None):
     response = requests.post(
