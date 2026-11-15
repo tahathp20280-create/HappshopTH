@@ -85,8 +85,8 @@ def ensure_user(user_id):
         (user_id,)
     )
     db.commit()
-    
-    def show_products(chat_id):
+
+def show_products(chat_id):
     buttons = []
 
     for key, product in PRODUCTS.items():
