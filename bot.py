@@ -84,7 +84,9 @@ def ensure_user(user_id):
         "INSERT OR IGNORE INTO users (user_id, balance) VALUES (?, 0)",
         (user_id,)
     )
-    db.commit()def show_products(chat_id):
+    db.commit()
+    
+    def show_products(chat_id):
     buttons = []
 
     for key, product in PRODUCTS.items():
