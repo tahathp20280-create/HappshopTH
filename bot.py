@@ -199,10 +199,10 @@ def buy_product(chat_id, user_id, product_key):
         f"مبلغ: {price:,} تومان\n\n"
         f"برای تحویل کانفیگ دستور زیر را ارسال کن:\n"
         f"/deliver {order_id} کانفیگ"
-)
 
 
 
+        
 def show_topup_options(chat_id):
     keyboard = {
         "inline_keyboard": [
@@ -212,7 +212,9 @@ def show_topup_options(chat_id):
             [{"text": "۲۰۰ هزار تومان", "callback_data": "topup_200000"}],
             [{"text": "۲۵۰ هزار تومان", "callback_data": "topup_250000"}],
             [{"text": "۳۰۰ هزار تومان", "callback_data": "topup_300000"}],
-            [{"text": "۳۵۰ هزار تومان", "callback_data": "topup_350000"}],
+            [{"text": "۳۵۰ هزار تومان", "callback_data": "topup_350000"}]
+        ]
+    }
 
     send_message(
         chat_id,
@@ -220,11 +222,12 @@ def show_topup_options(chat_id):
         keyboard
     )
 
+
     
 
 
 def create_topup(chat_id, user_id, amount):
-    fee = amount * 3 // 100
+    fee = amount * 2 // 100
     total = amount + fee
 
     cursor = db.execute(
