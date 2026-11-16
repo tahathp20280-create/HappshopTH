@@ -202,12 +202,17 @@ def buy_product(chat_id, user_id, product_key):
 )
 
 
+
 def show_topup_options(chat_id):
     keyboard = {
         "inline_keyboard": [
+            [{"text": "۵۰ هزار تومان", "callback_data": "topup_50000"}],
             [{"text": "۱۰۰ هزار تومان", "callback_data": "topup_100000"}],
+            [{"text": "۱۵۰ هزار تومان", "callback_data": "topup_150000"}],
             [{"text": "۲۰۰ هزار تومان", "callback_data": "topup_200000"}],
-            [{"text": "۳۰۰ هزار تومان", "callback_data": "topup_300000"}]
+            [{"text": "۲۵۰ هزار تومان", "callback_data": "topup_250000"}],
+            [{"text": "۳۰۰ هزار تومان", "callback_data": "topup_300000"}],
+            [{"text": "۳۵۰ هزار تومان", "callback_data": "topup_350000"}]
         ]
     }
 
@@ -216,6 +221,8 @@ def show_topup_options(chat_id):
         "💰 مبلغ شارژ کیف پول را انتخاب کن:",
         keyboard
     )
+
+    
 
 
 def create_topup(chat_id, user_id, amount):
