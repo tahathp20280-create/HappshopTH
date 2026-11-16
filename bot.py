@@ -212,9 +212,7 @@ def show_topup_options(chat_id):
             [{"text": "۲۰۰ هزار تومان", "callback_data": "topup_200000"}],
             [{"text": "۲۵۰ هزار تومان", "callback_data": "topup_250000"}],
             [{"text": "۳۰۰ هزار تومان", "callback_data": "topup_300000"}],
-            [{"text": "۳۵۰ هزار تومان", "callback_data": "topup_350000"}]
-        ]
-    }
+            [{"text": "۳۵۰ هزار تومان", "callback_data": "topup_350000"}],
 
     send_message(
         chat_id,
