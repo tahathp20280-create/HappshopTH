@@ -250,20 +250,6 @@ def handle_photo(message):
         "text": "رسید پرداخت شما دریافت شد و برای بررسی ارسال می‌شود."
     })
 
-            return
-
-    # دریافت عکس رسید پرداخت مشتری
-    api("sendMessage", {
-        "chat_id": chat_id,
-        "text": "رسید پرداخت شما دریافت شد و برای بررسی ارسال می‌شود."
-    })
-    api("sendMessage", {
-        "chat_id": chat_id,
-        "text": "رسید پرداخت شما دریافت شد و برای بررسی ارسال می‌شود."
-    })
-
-    # ادامه کد قبلی دریافت و ارسال رسید به ادمین
-
 
 def review_order(callback, approve):
     if callback["from"]["id"] != ADMIN_ID:
