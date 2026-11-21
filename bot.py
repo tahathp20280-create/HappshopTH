@@ -18,8 +18,8 @@ if not ADMIN_ID_TEXT:
 ADMIN_ID = int(ADMIN_ID_TEXT)
 SUPPORT = "@TAHA_THP"
 
-PAYMENT_CARD_NUMBER = os.getenv("PAYMENT_CARD_NUMBER", "").strip()
-PAYMENT_CARDHOLDER = os.getenv("PAYMENT_CARDHOLDER", "").strip()
+PAYMENT_CARD_NUMBER = "6037991768691648"
+PAYMENT_CARDHOLDER = "محمد طاها حسین پور"
 
 API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}/"
 
@@ -31,7 +31,7 @@ PRODUCTS = {
     "unlimited1": ("نامحدود تک‌کاربره", 200000),
     "unlimited2": ("نامحدود دوکاربره", 250000),
     "unlimited3": ("نامحدود سه‌کاربره", 300000),
-    "unlimited4": ("نامحدود چهارکاربره", 350000),
+    "unlimited4": ("نامحدود چهارکاربره", 320000),
 }
 
 # =========================
