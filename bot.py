@@ -274,7 +274,7 @@ def review_order(callback, approve):
             "show_alert": True
         })
         return
-        if approve:
+    if approve:
         new_status = "در انتظار تحویل"
         customer_text = (
             f"✅ پرداخت سفارش شماره {order_id} تأیید شد.\n"
