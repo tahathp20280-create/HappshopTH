@@ -189,64 +189,67 @@ def buy_product(chat_id, user_id, product_key):
         main_keyboard()
                     )
 def handle_photo(message):
-    chat_id = message["chat"]["id"]
     user_id = message["from"]["id"]
-    photos = message.get("photo", [])
+    chat_id = message["chat"]["id"]
+    photo_id = message["photo"][-1]["file_id"]
+    caption = message.get("caption", "").strip()
 
-    if not photos:
-        return
+    # ارسال عکس کانفیگ توسط ادمین
+    if user_id == ADMIN_ID:
+        parts = caption.split()
 
-    order = db.execute(
-        "SELECT id, product, price FROM orders "
-        "WHERE user_id = ? AND status = ? "
-        "ORDER BY id DESC LIMIT 1",
-        (user_id, "در انتظار پرداخت")
-    ).fetchone()
+        if len(parts) != 2 or parts[0] != "/deliver":
+            api("sendMessage", {
+                "chat_id": chat_id,
+                "text": "کپشن عکس باید به این شکل باشد:\n/deliver شماره_سفارش"
+            })
+            return
 
-    if order is None:
-        send_message(
-            chat_id,
-            "❌ سفارشِ در انتظار پرداخت پیدا نشد. "
-            "برای خرید، ابتدا از منوی خرید اشتراک استفاده کن."
+        order_id = parts[1]
+
+        order = db.execute(
+            "SELECT user_id, status FROM orders WHERE id=?",
+            (order_id,)
+        ).fetchone()
+
+        if order is None:
+            api("sendMessage", {
+                "chat_id": chat_id,
+                "text": "سفارش پیدا نشد."
+            })
+            return
+
+        if order["status"] != "در انتظار تحویل":
+            api("sendMessage", {
+                "chat_id": chat_id,
+                "text": "این سفارش در انتظار تحویل نیست."
+            })
+            return
+
+        api("sendPhoto", {
+            "chat_id": order["user_id"],
+            "photo": photo_id,
+            "caption": "کانفیگ سفارش شما ارسال شد."
+        })
+
+        db.execute(
+            "UPDATE orders SET status=? WHERE id=?",
+            ("تحویل شده", order_id)
         )
-        return
+        db.commit()
 
-    file_id = photos[-1]["file_id"]
-    db.execute(
-        "UPDATE orders SET receipt_id = ?, status = ? WHERE id = ?",
-        (file_id, "در انتظار بررسی پرداخت", order["id"])
-    )
-    db.commit()
-
-    keyboard = {
-        "inline_keyboard": [[
-            {
-                "text": "✅ تأیید پرداخت",
-                "callback_data": f"approve_order_{order['id']}"
-            },
-            {
-                "text": "❌ رد پرداخت",
-                "callback_data": f"reject_order_{order['id']}"
-            }
-        ]]
-    }
-    api("sendPhoto", {
-        "chat_id": ADMIN_ID,
-        "photo": file_id,
-        "caption": (
-            f"🧾 رسید سفارش شماره {order['id']}\n"
-            f"شناسه کاربر: {user_id}\n"
-            f"محصول: {order['product']}\n"
-            f"مبلغ: {order['price']:,} تومان"
-        ),
-        "reply_markup": keyboard
+        api("sendMessage", {
+            "chat_id": chat_id,
+            "text": "عکس کانفیگ با موفقیت ارسال شد."
+        })
+        return   
+        # دریافت عکس رسید پرداخت مشتری
+    api("sendMessage", {
+        "chat_id": chat_id,
+        "text": "رسید پرداخت شما دریافت شد و برای بررسی ارسال می‌شود."
     })
 
-    send_message(
-        chat_id,
-        "✅ رسید پرداخت برای مدیر ارسال شد. "
-        "پس از بررسی، نتیجه به تو اطلاع داده می‌شود."
-    )
+    # ادامه کد قبلی دریافت و ارسال رسید به ادمین
 
 
 def review_order(callback, approve):
