@@ -229,7 +229,8 @@ def handle_photo(message):
                 "callback_data": f"reject_order_{order['id']}"
             }
         ]]
-    }    api("sendPhoto", {
+    }
+    api("sendPhoto", {
         "chat_id": ADMIN_ID,
         "photo": file_id,
         "caption": (
