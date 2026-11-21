@@ -331,7 +331,8 @@ def admin_deliver(chat_id, text):
     order = db.execute(
         "SELECT user_id, status FROM orders WHERE id = ?",
         (order_id,)
-    ).fetchone()    if order is None:
+    ).fetchone()
+    if order is None:
         send_message(chat_id, "سفارش پیدا نشد.")
         return
     if order["status"] != "در انتظار تحویل":
