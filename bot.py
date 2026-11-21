@@ -242,8 +242,13 @@ def handle_photo(message):
             "chat_id": chat_id,
             "text": "عکس کانفیگ با موفقیت ارسال شد."
         })
-        return   
-        # دریافت عکس رسید پرداخت مشتری
+                return
+
+    # دریافت عکس رسید پرداخت مشتری
+    api("sendMessage", {
+        "chat_id": chat_id,
+        "text": "رسید پرداخت شما دریافت شد و برای بررسی ارسال می‌شود."
+    })
     api("sendMessage", {
         "chat_id": chat_id,
         "text": "رسید پرداخت شما دریافت شد و برای بررسی ارسال می‌شود."
