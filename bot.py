@@ -273,7 +273,8 @@ def review_order(callback, approve):
             "text": "این سفارش قبلاً بررسی شده یا وجود ندارد.",
             "show_alert": True
         })
-        return    if approve:
+        return
+        if approve:
         new_status = "در انتظار تحویل"
         customer_text = (
             f"✅ پرداخت سفارش شماره {order_id} تأیید شد.\n"
