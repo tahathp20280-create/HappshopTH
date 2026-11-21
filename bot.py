@@ -238,11 +238,11 @@ def handle_photo(message):
         )
         db.commit()
 
-        api("sendMessage", {
+            api("sendMessage", {
             "chat_id": chat_id,
             "text": "عکس کانفیگ با موفقیت ارسال شد."
         })
-                return
+        return
 
     # دریافت عکس رسید پرداخت مشتری
     api("sendMessage", {
