@@ -188,11 +188,12 @@ def buy_product(chat_id, user_id, product_key):
         "پس از بررسی مدیر، اشتراک برایت ارسال می‌شود.",
         main_keyboard()
                     )
-    def handle_photo(message):
-        chat_id = message["chat"]["id"]
-        user_id = message["from"]["id"]
-        photos = message.get("photo", [])
-        if not photos:
+def handle_photo(message):
+    chat_id = message["chat"]["id"]
+    user_id = message["from"]["id"]
+    photos = message.get("photo", [])
+
+    if not photos:
         return
 
     order = db.execute(
