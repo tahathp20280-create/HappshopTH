@@ -187,7 +187,8 @@ def buy_product(chat_id, user_id, product_key):
         "پس از پرداخت، تصویر رسید را همین‌جا ارسال کن.\n"
         "پس از بررسی مدیر، اشتراک برایت ارسال می‌شود.",
         main_keyboard()
-                    )def handle_photo(message):
+                    )
+    def handle_photo(message):
     chat_id = message["chat"]["id"]
     user_id = message["from"]["id"]
     photos = message.get("photo", [])
